@@ -1,0 +1,158 @@
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f2f5;
+    color: #333;
+    width: 120px; /* Even further reduced width for extreme minimalism */
+    box-sizing: border-box;
+}
+
+.container {
+    padding: 3px; /* Minimal padding */
+    background-color: #fff;
+    border-radius: 6px; /* Slightly less rounded corners */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Lighter shadow */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60px; /* Minimal height */
+}
+
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 3px; /* Very small space between buttons */
+    width: 100%;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    padding: 4px 8px; /* Very small padding for buttons */
+    border: none;
+    border-radius: 3px; /* Minimal border-radius */
+    cursor: pointer;
+    font-size: 12px; /* Smaller font size */
+    transition: background-color 0.2s ease, transform 0.1s ease; /* Faster transitions */
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+button:hover {
+    background-color: #0056b3;
+    transform: translateY(-0.5px); /* Subtle hover effect */
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* Inline Save Input Styling */
+input[type="text"]#saveNameInput {
+    width: calc(100% - 8px); /* Adjust for padding/border */
+    padding: 4px;
+    margin-top: 5px; /* Space above input */
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 12px;
+    box-sizing: border-box;
+}
+
+button#confirmSaveNameBtn {
+    background-color: #28a745; /* Green for confirm save */
+    margin-top: 3px; /* Space below input */
+}
+
+button#confirmSaveNameBtn:hover {
+    background-color: #218838;
+}
+
+
+.hidden {
+    display: none;
+}
+
+.message-box {
+    background-color: #e6f7ff;
+    color: #0056b3;
+    border: 1px solid #91d5ff;
+    padding: 5px; /* Minimal padding for message box */
+    border-radius: 4px;
+    margin-top: 5px; /* Minimal margin */
+    text-align: center;
+    font-size: 10px; /* Even smaller font size for message */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Saved Tabs Section Styling (retained from previous versions) */
+.saved-tabs-section {
+    width: 100%;
+    margin-top: 10px; /* Adjusted margin */
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+}
+
+.saved-tabs-heading {
+    font-size: 14px; /* Adjusted font size */
+    color: #34495e;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.saved-tabs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* Adjusted gap */
+}
+
+.saved-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px 8px; /* Adjusted padding */
+    font-size: 11px; /* Adjusted font size */
+    color: #555;
+}
+
+.saved-item-name {
+    flex-grow: 1;
+    cursor: pointer;
+    word-break: break-all;
+}
+
+.delete-button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 3px; /* Adjusted border-radius */
+    padding: 3px 6px; /* Adjusted padding */
+    font-size: 14px; /* Increased font size for the icon */
+    cursor: pointer;
+    margin-left: 8px;
+    transition: background-color 0.2s ease;
+    line-height: 1; /* Ensure icon is vertically centered */
+    display: flex; /* Use flexbox to center content if needed */
+    align-items: center; /* Center content vertically */
+    justify-content: center; /* Center content horizontally */
+    width: 20px; /* Fixed width for the icon button */
+    height: 20px; /* Fixed height for the icon button */
+}
+
+.delete-button:hover {
+    background-color: #c82333;
+}
+
+#noSavedTabsMessage {
+    text-align: center;
+    color: #777;
+    font-style: italic;
+    font-size: 11px; /* Adjusted font size */
+    padding: 5px;
+}

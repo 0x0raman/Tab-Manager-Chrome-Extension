@@ -19,13 +19,6 @@ A sleek, modern, and minimalist Chrome extension to effortlessly manage your bro
 
 ---
 
-## Preview
-
-![Tab URL Manager Preview](https://placehold.co/600x400/111827/F9FAFB?text=Extension%20UI%20Screenshot)
-*(A placeholder for a screenshot or GIF of the extension in action)*
-
----
-
 ## Installation
 
 Since this extension is not on the Chrome Web Store, you can load it locally for development or personal use.

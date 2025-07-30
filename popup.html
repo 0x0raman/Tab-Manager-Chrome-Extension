@@ -4,31 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tab URL Manager</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="popup.css">
 </head>
 <body>
     <div class="container">
+        <header class="header">
+            <h1>Tab URL Manager</h1>
+        </header>
         <div class="button-group">
-            <button id="copyAllTabsBtn">Copy</button>
-            <button id="pasteAndOpenBtn">Paste</button>
-            <button id="saveCurrentCopyBtn">Save Current Copy</button>
-            <!-- Inline input and confirm button for saving -->
-            <input type="text" id="saveNameInput" placeholder="Enter name" class="hidden">
-            <button id="confirmSaveNameBtn" class="hidden">Confirm Save</button>
+            <button id="copyAllTabsBtn">Copy URLs</button>
+            <button id="pasteAndOpenBtn">Paste & Open</button>
+            <button id="saveCurrentCopyBtn" disabled>Save Session</button>
         </div>
-
-        <div id="savedTabsSection" class="saved-tabs-section">
-            <h2 class="saved-tabs-heading">Saved Lists</h2>
-            <div id="savedTabsList" class="saved-tabs-list">
-                <!-- Saved tabs will be loaded here by JavaScript -->
-                <p id="noSavedTabsMessage">No saved lists yet.</p>
-            </div>
+        <div id="saveForm" class="save-form hidden">
+            <input type="text" id="saveNameInput" placeholder="Enter session name">
+            <button id="confirmSaveNameBtn">Confirm</button>
         </div>
-
-        <div id="messageBox" class="message-box hidden"></div>
+        <section class="saved-tabs-section">
+            <h2 class="saved-tabs-heading">Synced Sessions</h2>
+            <div id="savedTabsList" class="saved-tabs-list"></div>
+            <p id="noSavedTabsMessage" class="hidden">No saved sessions.</p>
+        </section>
+        <div id="messageBox" class="message-box" aria-live="polite" style="visibility: hidden;"></div>
     </div>
-
     <script src="popup.js"></script>
 </body>
 </html>

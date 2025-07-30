@@ -1,13 +1,22 @@
 {
   "manifest_version": 3,
   "name": "Tab URL Manager",
-  "version": "1.0",
-  "description": "Copy tabs URL to clipboard (formats: text, HTML, JSON, or custom). Paste to open multiple URLs at one go.",
+  "version": "2.1",
+  "description": "Copy tab URLs, open from clipboard, and sync saved sessions using your Chrome account.",
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
   },
   "permissions": [
-    "activeTab",
     "tabs",
     "clipboardRead",
     "clipboardWrite",

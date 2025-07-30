@@ -1,15 +1,18 @@
 :root {
-    --bg-color: #1a1b26;
-    --surface-color: #24283b;
-    --primary-accent: #7aa2f7;
-    --primary-accent-hover: #9eceff;
-    --danger-color: #f7768e;
-    --success-color: #9ece6a;
-    --text-primary: #c0caf5;
-    --text-secondary: #a9b1d6;
-    --border-color: #414868;
+    --bg-color: #111827;
+    --surface-color: #1F2937;
+    --primary-accent: #3B82F6;
+    --primary-accent-hover: #60A5FA;
+    --danger-color: #EF4444;
+    --text-primary: #F9FAFB;
+    --text-secondary: #9CA3AF;
+    --border-color: #374151;
     --font-family: 'Inter', sans-serif;
     --border-radius: 8px;
+}
+
+* {
+    box-sizing: border-box;
 }
 
 body {
@@ -18,126 +21,84 @@ body {
     background-color: var(--bg-color);
     color: var(--text-primary);
     width: 350px;
-    overflow: hidden;
+    /* REMOVED fixed height, ADDED max-height for flexibility */
+    max-height: 550px; 
 }
 
 .container {
-    position: relative;
-    width: 350px;
-    height: 500px;
-}
-
-.view {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
+    padding: 12px;
     height: 100%;
-    padding: 16px;
-    box-sizing: border-box;
-    background-color: var(--bg-color);
-    transition: transform 0.3s ease-in-out;
     display: flex;
     flex-direction: column;
 }
 
-#main-view {
-    transform: translateX(0);
-}
-
-#settings-view {
-    transform: translateX(100%);
-}
-
-.container.settings-active #main-view {
-    transform: translateX(-100%);
-}
-
-.container.settings-active #settings-view {
-    transform: translateX(0);
-}
-
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-    flex-shrink: 0;
-}
-
-h1, h2 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-}
-
-.icon-btn {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.icon-btn:hover {
-    color: var(--primary-accent);
-    background-color: var(--surface-color);
-}
-.icon-btn svg {
-    width: 24px;
-    height: 24px;
-}
-
-.button-group {
+/* --- Top Action Buttons --- */
+.actions-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 8px;
     margin-bottom: 12px;
 }
 
-button {
+.action-btn {
     background-color: var(--surface-color);
-    color: var(--text-primary);
-    padding: 8px 12px;
+    color: var(--text-secondary);
+    height: 50px;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
     cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-button:hover {
-    background-color: var(--primary-accent);
-    border-color: var(--primary-accent);
-    color: var(--bg-color);
-}
-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    background-color: var(--surface-color);
-    border-color: var(--border-color);
+.action-btn:hover {
+    background-color: var(--border-color);
     color: var(--text-primary);
 }
 
+.action-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background-color: var(--surface-color);
+    color: var(--text-secondary);
+}
+
+.action-btn svg {
+    width: 22px;
+    height: 22px;
+}
+
+/* --- Save Form --- */
 .save-form {
     display: flex;
     gap: 8px;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
+    transition: opacity 0.3s ease, transform 0.3s ease, max-height 0.3s ease;
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-10px);
+    overflow: hidden;
+}
+
+.save-form:not(.hidden) {
+    max-height: 100px;
+    opacity: 1;
+    transform: translateY(0);
 }
 
 #saveNameInput {
     flex-grow: 1;
-    padding: 8px;
+    padding: 0 12px;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
     font-size: 13px;
-    background-color: var(--surface-color);
+    background-color: var(--bg-color);
     color: var(--text-primary);
+    transition: border-color 0.2s ease;
 }
+
 #saveNameInput:focus {
     outline: none;
     border-color: var(--primary-accent);
@@ -145,34 +106,46 @@ button:disabled {
 
 #confirmSaveNameBtn {
     background-color: var(--primary-accent);
-    color: var(--bg-color);
-    border-color: var(--primary-accent);
+    color: var(--text-primary);
+    border: none;
+    border-radius: var(--border-radius);
+    flex-shrink: 0;
+    width: 50px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+#confirmSaveNameBtn:hover {
+    background-color: var(--primary-accent-hover);
+}
+#confirmSaveNameBtn svg {
+    width: 24px;
+    height: 24px;
 }
 
-.saved-tabs-section {
+/* --- Saved List --- */
+.list-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 4px; /* For scrollbar spacing */
     border-top: 1px solid var(--border-color);
     padding-top: 12px;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
 }
 
-.saved-tabs-heading {
-    text-align: center;
-    font-size: 14px;
-    margin: 0 0 10px 0;
-    color: var(--text-secondary);
-    flex-shrink: 0;
+.list-container::-webkit-scrollbar { width: 6px; }
+.list-container::-webkit-scrollbar-track { background: transparent; }
+.list-container::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 20px;
 }
 
-.saved-tabs-list {
+#savedTabsList {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    overflow-y: auto;
-    flex-grow: 1;
-    padding-right: 4px;
 }
 
 .saved-item {
@@ -183,16 +156,20 @@ button:disabled {
     padding: 10px 14px;
     font-size: 14px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    border: 1px solid var(--surface-color);
 }
+
 .saved-item:hover {
-    background-color: #2d324a;
+    border-color: var(--border-color);
 }
+
 .saved-item-name {
     flex-grow: 1;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    padding-right: 12px;
 }
 
 .delete-button {
@@ -200,19 +177,23 @@ button:disabled {
     border: none;
     color: var(--text-secondary);
     padding: 0;
-    margin-left: 12px;
+    margin-left: auto;
     flex-shrink: 0;
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
+
 .delete-button:hover {
     background-color: var(--danger-color);
-    color: var(--bg-color);
+    color: var(--text-primary);
 }
+
 .delete-icon {
     width: 16px;
     height: 16px;
@@ -221,52 +202,46 @@ button:disabled {
     mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>');
 }
 
-
-#auth-container {
+#noSavedTabsMessage {
     text-align: center;
-    padding: 20px;
-}
-#auth-status {
-    margin-bottom: 20px;
-    font-size: 14px;
     color: var(--text-secondary);
-}
-.auth-btn {
-    width: 100%;
-    padding: 12px;
-}
-#logout-btn {
-    background-color: var(--danger-color);
-    border-color: var(--danger-color);
-    color: var(--bg-color);
+    padding: 30px 20px;
+    font-size: 13px;
 }
 
-.hidden { display: none !important; }
-
+/* --- Message Box --- */
 .message-box {
-    position: fixed;
-    bottom: 16px;
-    left: 16px;
-    right: 16px;
-    padding: 12px;
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    padding: 10px;
     border-radius: var(--border-radius);
     text-align: center;
-    font-size: 14px;
-    font-weight: 600;
-    z-index: 100;
+    font-size: 13px;
+    font-weight: 500;
     transition: transform 0.3s ease, opacity 0.3s ease;
-    transform: translateY(200%);
+    transform: translateY(150%);
     opacity: 0;
+    visibility: hidden;
 }
+
 .message-box.show {
     transform: translateY(0);
     opacity: 1;
+    visibility: visible;
 }
+
 .message-box.success {
-    background-color: var(--success-color);
-    color: var(--bg-color);
+    background-color: #10B981;
+    color: var(--text-primary);
 }
+
 .message-box.error {
     background-color: var(--danger-color);
-    color: var(--bg-color);
+    color: var(--text-primary);
+}
+
+.hidden {
+    display: none;
 }

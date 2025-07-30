@@ -25,7 +25,7 @@ Since this extension is not on the Chrome Web Store, you can load it locally for
 
 1.  **Clone or Download**: Clone this repository or download it as a ZIP file and unzip it.
     ```sh
-    git clone [https://github.com/your-username/tab-url-manager.git](https://github.com/your-username/tab-url-manager.git)
+    git clone https://github.com/0x0raman/Tab-Manager-Chrome-Extension.git
     ```
 2.  **Open Chrome Extensions**: Open Google Chrome and navigate to `chrome://extensions`.
 3.  **Enable Developer Mode**: In the top right corner, toggle the "Developer mode" switch on.

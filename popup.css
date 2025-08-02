@@ -8,7 +8,7 @@
     --text-secondary: #9CA3AF;
     --border-color: #374151;
     --font-family: 'Inter', sans-serif;
-    --border-radius: 5px; /* Slightly smaller radius */
+    --border-radius: 5px;
 }
 
 * {
@@ -20,12 +20,12 @@ body {
     margin: 0;
     background-color: var(--bg-color);
     color: var(--text-primary);
-    width: 280px; /* Further Reduced width */
-    max-height: 450px; /* Further Reduced max-height */
+    width: 280px;
+    max-height: 450px;
 }
 
 .container {
-    padding: 8px; /* Further Reduced padding */
+    padding: 8px;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -34,15 +34,15 @@ body {
 /* --- Top Action Buttons --- */
 .actions-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 5px; /* Further Reduced gap */
-    margin-bottom: 8px; /* Further Reduced margin */
+    grid-template-columns: repeat(5, 1fr); /* Changed from 3 to 5 to fit new buttons */
+    gap: 5px;
+    margin-bottom: 8px;
 }
 
 .action-btn {
     background-color: var(--surface-color);
     color: var(--text-secondary);
-    height: 36px; /* Further Reduced height */
+    height: 36px;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
     cursor: pointer;
@@ -50,6 +50,7 @@ body {
     align-items: center;
     justify-content: center;
     transition: background-color 0.2s ease, color 0.2s ease;
+    padding: 0;
 }
 
 .action-btn:hover {
@@ -65,8 +66,8 @@ body {
 }
 
 .action-btn svg {
-    width: 18px; /* Further Reduced icon size */
-    height: 18px; /* Further Reduced icon size */
+    width: 18px;
+    height: 18px;
 }
 
 /* --- Save Form --- */
@@ -89,7 +90,7 @@ body {
 
 #saveNameInput {
     flex-grow: 1;
-    height: 34px; /* Further Reduced height */
+    height: 34px;
     padding: 0 10px;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
@@ -110,8 +111,8 @@ body {
     border: none;
     border-radius: var(--border-radius);
     flex-shrink: 0;
-    width: 38px; /* Further Reduced width */
-    height: 34px; /* Further Reduced height */
+    width: 38px;
+    height: 34px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -122,8 +123,8 @@ body {
     background-color: var(--primary-accent-hover);
 }
 #confirmSaveNameBtn svg {
-    width: 18px; /* Further Reduced icon size */
-    height: 18px; /* Further Reduced icon size */
+    width: 18px;
+    height: 18px;
 }
 
 /* --- Saved List --- */
@@ -132,7 +133,7 @@ body {
     overflow-y: auto;
     padding-right: 4px;
     border-top: 1px solid var(--border-color);
-    padding-top: 8px; /* Further Reduced padding */
+    padding-top: 8px;
 }
 
 .list-container::-webkit-scrollbar { width: 5px; }
@@ -145,7 +146,7 @@ body {
 #savedTabsList {
     display: flex;
     flex-direction: column;
-    gap: 5px; /* Further Reduced gap */
+    gap: 5px;
 }
 
 .saved-item {
@@ -153,8 +154,8 @@ body {
     align-items: center;
     background-color: var(--surface-color);
     border-radius: var(--border-radius);
-    padding: 8px 10px; /* Further Reduced padding */
-    font-size: 12px; /* Further Reduced font size */
+    padding: 8px 10px;
+    font-size: 12px;
     cursor: pointer;
     transition: background-color 0.2s ease, border-color 0.2s ease;
     border: 1px solid var(--surface-color);
@@ -179,8 +180,8 @@ body {
     padding: 0;
     margin-left: auto;
     flex-shrink: 0;
-    width: 24px; /* Further Reduced size */
-    height: 24px; /* Further Reduced size */
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -195,8 +196,8 @@ body {
 }
 
 .delete-icon {
-    width: 14px; /* Further Reduced icon size */
-    height: 14px; /* Further Reduced icon size */
+    width: 14px;
+    height: 14px;
     background-color: currentColor;
     -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>');
     mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>');
@@ -205,31 +206,31 @@ body {
 #noSavedTabsMessage {
     text-align: center;
     color: var(--text-secondary);
-    padding: 20px 15px; /* Further Reduced padding */
-    font-size: 11px; /* Further Reduced font size */
+    padding: 20px 15px;
+    font-size: 11px;
 }
 
 /* --- Message Box --- */
 .message-box {
     position: absolute;
-    bottom: 8px; /* Adjusted position */
-    left: 8px; /* Adjusted position */
-    right: 8px; /* Adjusted position */
+    bottom: 8px;
+    left: 8px;
+    right: 8px;
     padding: 8px;
     border-radius: var(--border-radius);
     text-align: center;
-    font-size: 11px; /* Further Reduced font size */
+    font-size: 11px;
     font-weight: 500;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-    transform: translateY(150%);
-    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease, visibility 0.3s;
+    transform: translateY(100%);
     visibility: hidden;
+    opacity: 0;
 }
 
-.message-box.show {
+.message-box.visible {
     transform: translateY(0);
-    opacity: 1;
     visibility: visible;
+    opacity: 1;
 }
 
 .message-box.success {

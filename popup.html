@@ -11,7 +11,6 @@
 </head>
 <body>
     <div class="container">
-        <!-- Action Buttons with Icons -->
         <div class="actions-grid">
             <button id="copyAllTabsBtn" class="action-btn" title="Copy All URLs">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
@@ -22,9 +21,16 @@
             <button id="saveCurrentCopyBtn" class="action-btn" title="Save Current Session" disabled>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
             </button>
+            
+            <button id="exportBtn" class="action-btn" title="Export Sessions">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            </button>
+            <label for="importInput" id="importBtn" class="action-btn" title="Import Sessions">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0z" fill="none"/><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+            </label>
+            <input type="file" id="importInput" accept=".json" style="display: none;" />
         </div>
 
-        <!-- Inline Save Form -->
         <div id="saveForm" class="save-form hidden">
             <input type="text" id="saveNameInput" placeholder="Enter session name">
             <button id="confirmSaveNameBtn" title="Confirm Save">
@@ -32,15 +38,12 @@
             </button>
         </div>
 
-        <!-- Saved Sessions List -->
         <div class="list-container">
             <p id="noSavedTabsMessage" class="hidden">No saved sessions.</p>
             <div id="savedTabsList">
-                <!-- Saved items will be injected here by JS -->
-            </div>
+                </div>
         </div>
 
-        <!-- Floating Message Box -->
         <div id="messageBox" class="message-box" aria-live="polite"></div>
     </div>
     <script src="popup.js"></script>

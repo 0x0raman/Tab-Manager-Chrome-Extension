@@ -12,13 +12,15 @@ const noSavedTabsMessage = getEl('noSavedTabsMessage');
 
 // --- State ---
 let tabsToSave = [];
+let messageTimeout;
 
 // --- UI Functions ---
 const showMessage = (message, type = 'success', duration = 3000) => {
+    clearTimeout(messageTimeout); // Clear previous timeout
     messageBox.textContent = message;
     messageBox.className = `message-box ${type}`;
     messageBox.style.visibility = 'visible';
-    setTimeout(() => {
+    messageTimeout = setTimeout(() => {
         messageBox.style.visibility = 'hidden';
     }, duration);
 };
@@ -42,7 +44,7 @@ const renderSavedSessions = async () => {
         itemDiv.dataset.id = session.id;
         itemDiv.innerHTML = `
             <span class="saved-item-name">${session.name}</span>
-            <button class="delete-button" data-id="${session.id}" aria-label="Delete ${session.name}">
+            <button class="delete-button" aria-label="Delete ${session.name}">
                 <div class="delete-icon"></div>
             </button>
         `;
@@ -54,7 +56,6 @@ const renderSavedSessions = async () => {
 // --- Data Functions (chrome.storage.sync) ---
 const getSyncedSessions = async () => {
     const { savedSessions = [] } = await chrome.storage.sync.get('savedSessions');
-    // Sort by timestamp descending (most recent first)
     return savedSessions.sort((a, b) => b.timestamp - a.timestamp);
 };
 
@@ -86,7 +87,7 @@ const handlePasteAndOpen = async () => {
         let openedCount = 0;
         urls.forEach(url => {
             try {
-                new URL(url);
+                new URL(url); // Validate URL
                 chrome.tabs.create({ url, active: false });
                 openedCount++;
             } catch (e) { console.warn(`Skipping invalid URL: ${url}`); }
@@ -116,7 +117,7 @@ const handleConfirmSave = async () => {
     await saveSyncedSessions(sessions);
     
     showMessage(`'${name}' saved and synced!`, 'success');
-    renderSavedSessions();
+    // renderSavedSessions() will be triggered by the onChanged listener
 
     saveNameInput.value = '';
     toggleSaveForm(false);
@@ -125,19 +126,19 @@ const handleConfirmSave = async () => {
 };
 
 const handleSavedListClick = async (e) => {
-    const button = e.target.closest('.delete-button');
     const item = e.target.closest('.saved-item');
     if (!item) return;
 
+    const button = e.target.closest('.delete-button');
     const id = item.dataset.id;
-    if (button) { // If the delete button was clicked
-        let sessions = await getSyncedSessions();
-        sessions = sessions.filter(s => s.id !== id);
-        await saveSyncedSessions(sessions);
+    const sessions = await getSyncedSessions(); // Fetch data once
+
+    if (button) {
+        const updatedSessions = sessions.filter(s => s.id !== id);
+        await saveSyncedSessions(updatedSessions);
         showMessage("Session deleted.", "success");
-        renderSavedSessions();
-    } else { // If any other part of the item was clicked
-        const sessions = await getSyncedSessions();
+        // renderSavedSessions() will be triggered by the onChanged listener
+    } else {
         const session = sessions.find(s => s.id === id);
         if (session && session.urls) {
             session.urls.forEach(tab => chrome.tabs.create({ url: tab.url, active: false }));
@@ -154,15 +155,14 @@ const init = () => {
     confirmSaveNameBtn.addEventListener('click', handleConfirmSave);
     savedTabsList.addEventListener('click', handleSavedListClick);
     
-    // Listen for changes in synced storage and update UI
     chrome.storage.onChanged.addListener((changes, namespace) => {
         if (namespace === 'sync' && changes.savedSessions) {
+            console.log('Storage changed, re-rendering...');
             renderSavedSessions();
         }
     });
 
-    // Initial render
-    renderSavedSessions();
+    renderSavedSessions(); // Initial render
 };
 
 document.addEventListener('DOMContentLoaded', init);

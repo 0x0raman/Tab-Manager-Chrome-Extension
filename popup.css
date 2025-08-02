@@ -34,7 +34,7 @@ body {
 /* --- Top Action Buttons --- */
 .actions-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr); /* Changed from 3 to 5 to fit new buttons */
+    grid-template-columns: repeat(5, 1fr);
     gap: 5px;
     margin-bottom: 8px;
 }
@@ -156,13 +156,14 @@ body {
     border-radius: var(--border-radius);
     padding: 8px 10px;
     font-size: 12px;
-    cursor: pointer;
     transition: background-color 0.2s ease, border-color 0.2s ease;
     border: 1px solid var(--surface-color);
 }
 
+/* NEW: Add grab cursor to show items are draggable */
 .saved-item:hover {
     border-color: var(--border-color);
+    cursor: grab;
 }
 
 .saved-item-name {
@@ -171,6 +172,18 @@ body {
     text-overflow: ellipsis;
     white-space: nowrap;
     padding-right: 10px;
+}
+
+/* NEW: Styling for the drag-and-drop placeholder */
+.sortable-ghost {
+    background-color: var(--primary-accent) !important;
+    opacity: 0.5;
+}
+
+/* NEW: Styling for the item being dragged */
+.sortable-drag {
+    opacity: 0.7 !important;
+    cursor: grabbing !important;
 }
 
 .delete-button {

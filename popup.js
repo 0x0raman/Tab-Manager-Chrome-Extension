@@ -20,10 +20,9 @@ let messageTimeout;
 const showMessage = (message, type = 'success', duration = 3000) => {
     clearTimeout(messageTimeout);
     messageBox.textContent = message;
-    messageBox.className = `message-box ${type}`;
-    messageBox.style.visibility = 'visible';
+    messageBox.className = `message-box visible ${type}`;
     messageTimeout = setTimeout(() => {
-        messageBox.style.visibility = 'hidden';
+        messageBox.classList.remove('visible');
     }, duration);
 };
 
@@ -58,7 +57,8 @@ const renderSavedSessions = async () => {
 // --- Data Functions (chrome.storage.sync) ---
 const getSyncedSessions = async () => {
     const { savedSessions = [] } = await chrome.storage.sync.get('savedSessions');
-    return savedSessions.sort((a, b) => b.timestamp - a.timestamp);
+    // CRITICAL CHANGE: Remove sorting. The order is now controlled by the user.
+    return savedSessions;
 };
 
 const saveSyncedSessions = (sessions) => {
@@ -110,10 +110,10 @@ const handleConfirmSave = async () => {
         id: crypto.randomUUID(),
         name,
         urls: tabsToSave,
-        timestamp: Date.now()
+        timestamp: Date.now() // Timestamp is still useful for sorting if ever needed again
     };
     
-    sessions.push(newSession);
+    sessions.push(newSession); // New sessions are added to the end
     await saveSyncedSessions(sessions);
     
     showMessage(`'${name}' saved and synced!`, 'success');
@@ -144,7 +144,6 @@ const handleSavedListClick = async (e) => {
     }
 };
 
-// --- NEW IMPORT/EXPORT HANDLERS ---
 const handleExport = async () => {
     const sessions = await getSyncedSessions();
     if (sessions.length === 0) {
@@ -180,10 +179,9 @@ const handleImport = (event) => {
 
             const existingSessions = await getSyncedSessions();
             
-            // Merge sessions and remove duplicates, giving preference to imported data
             const sessionMap = new Map();
             existingSessions.forEach(s => sessionMap.set(s.id, s));
-            importedSessions.forEach(s => sessionMap.set(s.id, s)); // Overwrites if ID exists
+            importedSessions.forEach(s => sessionMap.set(s.id, s));
 
             const mergedSessions = Array.from(sessionMap.values());
             await saveSyncedSessions(mergedSessions);
@@ -193,7 +191,6 @@ const handleImport = (event) => {
             console.error('Import failed:', err);
             showMessage('Import failed. Invalid file.', 'error');
         } finally {
-            // Reset input so the same file can be imported again
             importInput.value = '';
         }
     };
@@ -213,6 +210,23 @@ const init = () => {
     chrome.storage.onChanged.addListener((changes, namespace) => {
         if (namespace === 'sync' && changes.savedSessions) {
             renderSavedSessions();
+        }
+    });
+    
+    // NEW: Initialize Drag and Drop
+    Sortable.create(savedTabsList, {
+        animation: 150, // ms, animation speed moving items when sorting, `0` — without animation
+        ghostClass: 'sortable-ghost', // Class name for the drop placeholder
+        onEnd: async (evt) => {
+            // Fired when the user drops an item
+            const sessions = await getSyncedSessions();
+            
+            // Reorder the array based on the drag-and-drop action
+            const [movedItem] = sessions.splice(evt.oldIndex, 1);
+            sessions.splice(evt.newIndex, 0, movedItem);
+
+            // Save the newly ordered array
+            await saveSyncedSessions(sessions);
         }
     });
 

@@ -12,9 +12,11 @@ const noSavedTabsMessage = getEl('noSavedTabsMessage');
 const exportBtn = getEl('exportBtn');
 const importInput = getEl('importInput');
 
-// --- State ---
+// --- State & Constants ---
 let tabsToSave = [];
 let messageTimeout;
+const SESSION_PREFIX = 'session_';
+const SESSION_ORDER_KEY = 'session_order';
 
 // --- UI Functions ---
 const showMessage = (message, type = 'success', duration = 3000) => {
@@ -55,14 +57,17 @@ const renderSavedSessions = async () => {
 };
 
 // --- Data Functions (chrome.storage.sync) ---
+/**
+ * Retrieves all sessions in the user-defined order.
+ * It first gets the order array, then fetches each session individually.
+ */
 const getSyncedSessions = async () => {
-    const { savedSessions = [] } = await chrome.storage.sync.get('savedSessions');
-    // CRITICAL CHANGE: Remove sorting. The order is now controlled by the user.
-    return savedSessions;
-};
-
-const saveSyncedSessions = (sessions) => {
-    return chrome.storage.sync.set({ savedSessions: sessions });
+    const data = await chrome.storage.sync.get(null);
+    const order = data[SESSION_ORDER_KEY] || [];
+    const sessions = order
+        .map(id => data[SESSION_PREFIX + id])
+        .filter(Boolean); // Filter out any inconsistencies
+    return sessions;
 };
 
 // --- Event Handlers ---
@@ -93,7 +98,6 @@ const handlePasteAndOpen = async () => {
             } catch (e) { console.warn(`Skipping invalid URL: ${url}`); }
         });
         if (urls.length > 0) showMessage(`Opened ${urls.length} tab(s).`);
-
     } catch (err) {
         console.error('Failed to read from clipboard:', err);
         showMessage('Could not read clipboard.', 'error');
@@ -105,38 +109,57 @@ const handleConfirmSave = async () => {
     if (!name) return showMessage('Please enter a name.', 'error');
     if (tabsToSave.length === 0) return showMessage('Nothing to save.', 'error');
 
-    const sessions = await getSyncedSessions();
     const newSession = {
         id: crypto.randomUUID(),
         name,
         urls: tabsToSave,
-        timestamp: Date.now() // Timestamp is still useful for sorting if ever needed again
+        timestamp: Date.now()
     };
     
-    sessions.push(newSession); // New sessions are added to the end
-    await saveSyncedSessions(sessions);
-    
-    showMessage(`'${name}' saved and synced!`, 'success');
-    saveNameInput.value = '';
-    toggleSaveForm(false);
-    tabsToSave = [];
-    saveCurrentCopyBtn.disabled = true;
+    try {
+        const { [SESSION_ORDER_KEY]: order = [] } = await chrome.storage.sync.get(SESSION_ORDER_KEY);
+        order.push(newSession.id); // Add new session ID to the end of the order
+
+        const sessionKey = `${SESSION_PREFIX}${newSession.id}`;
+        // Save the new session object and the updated order array
+        await chrome.storage.sync.set({ [sessionKey]: newSession, [SESSION_ORDER_KEY]: order });
+        
+        showMessage(`'${name}' saved and synced!`, 'success');
+        saveNameInput.value = '';
+        toggleSaveForm(false);
+        tabsToSave = [];
+        saveCurrentCopyBtn.disabled = true;
+    } catch (error) {
+        console.error("Save failed:", error);
+        if (error.message.includes('QUOTA_BYTES')) {
+             showMessage('Chrome sync storage is full. Please remove some sessions.', 'error', 5000);
+        } else {
+             showMessage('An error occurred while saving.', 'error');
+        }
+    }
 };
 
 const handleSavedListClick = async (e) => {
     const item = e.target.closest('.saved-item');
     if (!item) return;
 
-    const button = e.target.closest('.delete-button');
     const id = item.dataset.id;
-    const sessions = await getSyncedSessions();
+    const button = e.target.closest('.delete-button');
 
-    if (button) {
-        const updatedSessions = sessions.filter(s => s.id !== id);
-        await saveSyncedSessions(updatedSessions);
+    if (button) { // Handle Delete
+        const sessionKey = `${SESSION_PREFIX}${id}`;
+        const { [SESSION_ORDER_KEY]: order = [] } = await chrome.storage.sync.get(SESSION_ORDER_KEY);
+        const newOrder = order.filter(sessionId => sessionId !== id);
+
+        // Remove the session object and update the order array
+        await chrome.storage.sync.remove(sessionKey);
+        await chrome.storage.sync.set({ [SESSION_ORDER_KEY]: newOrder });
+        
         showMessage("Session deleted.", "success");
-    } else {
-        const session = sessions.find(s => s.id === id);
+    } else { // Handle Open
+        const sessionKey = `${SESSION_PREFIX}${id}`;
+        const data = await chrome.storage.sync.get(sessionKey);
+        const session = data[sessionKey];
         if (session && session.urls) {
             session.urls.forEach(tab => chrome.tabs.create({ url: tab.url, active: false }));
             showMessage(`Opening session '${session.name}'...`);
@@ -146,20 +169,16 @@ const handleSavedListClick = async (e) => {
 
 const handleExport = async () => {
     const sessions = await getSyncedSessions();
-    if (sessions.length === 0) {
-        return showMessage('Nothing to export.', 'error');
-    }
+    if (sessions.length === 0) return showMessage('Nothing to export.', 'error');
 
     const jsonString = JSON.stringify(sessions, null, 2);
     const blob = new Blob([jsonString], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-
     const date = new Date().toISOString().slice(0, 10);
     a.href = url;
     a.download = `tab-sessions-backup-${date}.json`;
     a.click();
-
     URL.revokeObjectURL(url);
     showMessage('Sessions exported!', 'success');
 };
@@ -172,20 +191,24 @@ const handleImport = (event) => {
     reader.onload = async (e) => {
         try {
             const importedSessions = JSON.parse(e.target.result);
+            if (!Array.isArray(importedSessions)) throw new Error('Invalid format');
 
-            if (!Array.isArray(importedSessions)) {
-                throw new Error('Invalid format: not an array.');
-            }
+            const dataToSave = {};
+            const newIds = [];
 
-            const existingSessions = await getSyncedSessions();
+            importedSessions.forEach(session => {
+                // Ensure sessions have all required fields before importing
+                if (session.id && session.name && Array.isArray(session.urls)) {
+                    dataToSave[SESSION_PREFIX + session.id] = session;
+                    newIds.push(session.id);
+                }
+            });
             
-            const sessionMap = new Map();
-            existingSessions.forEach(s => sessionMap.set(s.id, s));
-            importedSessions.forEach(s => sessionMap.set(s.id, s));
+            const { [SESSION_ORDER_KEY]: order = [] } = await chrome.storage.sync.get(SESSION_ORDER_KEY);
+            const mergedOrder = [...order, ...newIds.filter(id => !order.includes(id))];
+            dataToSave[SESSION_ORDER_KEY] = mergedOrder;
 
-            const mergedSessions = Array.from(sessionMap.values());
-            await saveSyncedSessions(mergedSessions);
-
+            await chrome.storage.sync.set(dataToSave);
             showMessage('Sessions imported successfully!', 'success');
         } catch (err) {
             console.error('Import failed:', err);
@@ -201,32 +224,31 @@ const handleImport = (event) => {
 const init = () => {
     copyAllTabsBtn.addEventListener('click', handleCopy);
     pasteAndOpenBtn.addEventListener('click', handlePasteAndOpen);
-    saveCurrentCopyBtn.addEventListener('click', () => toggleSaveForm(true));
+    saveCurrentCopyBtn.addEventListener('click', () => {
+        if (!saveCurrentCopyBtn.disabled) toggleSaveForm(true);
+    });
     confirmSaveNameBtn.addEventListener('click', handleConfirmSave);
     savedTabsList.addEventListener('click', handleSavedListClick);
     exportBtn.addEventListener('click', handleExport);
     importInput.addEventListener('change', handleImport);
     
+    // Listen for any changes in sync storage to re-render the list
     chrome.storage.onChanged.addListener((changes, namespace) => {
-        if (namespace === 'sync' && changes.savedSessions) {
+        if (namespace === 'sync') {
             renderSavedSessions();
         }
     });
     
-    // NEW: Initialize Drag and Drop
+    // Initialize Drag and Drop
     Sortable.create(savedTabsList, {
-        animation: 150, // ms, animation speed moving items when sorting, `0` — without animation
-        ghostClass: 'sortable-ghost', // Class name for the drop placeholder
-        onEnd: async (evt) => {
-            // Fired when the user drops an item
-            const sessions = await getSyncedSessions();
-            
-            // Reorder the array based on the drag-and-drop action
-            const [movedItem] = sessions.splice(evt.oldIndex, 1);
-            sessions.splice(evt.newIndex, 0, movedItem);
-
-            // Save the newly ordered array
-            await saveSyncedSessions(sessions);
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        onEnd: async () => {
+            // When drag ends, get the new order of IDs from the DOM
+            const items = savedTabsList.querySelectorAll('.saved-item');
+            const newOrder = Array.from(items).map(item => item.dataset.id);
+            // Save only the new order array
+            await chrome.storage.sync.set({ [SESSION_ORDER_KEY]: newOrder });
         }
     });
 

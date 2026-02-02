@@ -119,9 +119,11 @@ body {
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
+
 #confirmSaveNameBtn:hover {
     background-color: var(--primary-accent-hover);
 }
+
 #confirmSaveNameBtn svg {
     width: 18px;
     height: 18px;
@@ -136,8 +138,14 @@ body {
     padding-top: 8px;
 }
 
-.list-container::-webkit-scrollbar { width: 5px; }
-.list-container::-webkit-scrollbar-track { background: transparent; }
+.list-container::-webkit-scrollbar {
+    width: 5px;
+}
+
+.list-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
 .list-container::-webkit-scrollbar-thumb {
     background-color: var(--border-color);
     border-radius: 20px;
@@ -151,28 +159,121 @@ body {
 
 .saved-item {
     display: flex;
-    align-items: center;
+    flex-direction: column;
     background-color: var(--surface-color);
     border-radius: var(--border-radius);
-    padding: 8px 10px;
+    padding: 0;
     font-size: 12px;
     transition: background-color 0.2s ease, border-color 0.2s ease;
     border: 1px solid var(--surface-color);
 }
 
-/* NEW: Add grab cursor to show items are draggable */
 .saved-item:hover {
     border-color: var(--border-color);
+}
+
+.session-header {
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    width: 100%;
     cursor: grab;
 }
 
+.session-title-container {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+    padding-right: 10px;
+}
+
 .saved-item-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rename-input {
+    width: 100%;
+    background: var(--bg-color);
+    border: 1px solid var(--primary-accent);
+    color: var(--text-primary);
+    border-radius: 3px;
+    padding: 2px 5px;
+    font-size: 12px;
+    font-family: inherit;
+}
+
+.expand-toggle {
+    margin-right: 4px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: transform 0.2s ease;
+}
+
+.expand-toggle.expanded {
+    transform: rotate(90deg);
+}
+
+.url-list {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-top: 1px solid var(--border-color);
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.url-list.visible {
+    display: flex;
+}
+
+.url-item {
+    display: flex;
+    align-items: center;
+    padding: 6px 10px 6px 28px;
+    /* Indent to align with text */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 11px;
+}
+
+.url-item:last-child {
+    border-bottom: none;
+}
+
+.url-text {
     flex-grow: 1;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    padding-right: 10px;
+    color: var(--text-secondary);
+    margin-right: 8px;
 }
+
+.url-delete-btn {
+    opacity: 0;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    transition: color 0.2s, opacity 0.2s;
+}
+
+.url-item:hover .url-delete-btn {
+    opacity: 1;
+}
+
+.url-delete-btn:hover {
+    color: var(--danger-color);
+}
+
 
 /* NEW: Styling for the drag-and-drop placeholder */
 .sortable-ghost {

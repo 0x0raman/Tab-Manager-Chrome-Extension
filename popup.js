@@ -103,6 +103,7 @@ const renderSavedSessions = async () => {
         const input = savedTabsList.querySelector(`.saved-item[data-id="${editingSessionId}"] .rename-input`);
         if (input) {
             input.focus();
+            input.select(); // Select all text for easy replacement
             input.addEventListener('blur', () => handleRenameFinish(editingSessionId, input.value));
             input.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') handleRenameFinish(editingSessionId, input.value);
@@ -173,7 +174,7 @@ const handleConfirmSave = async () => {
 
     try {
         const { [SESSION_ORDER_KEY]: order = [] } = await chrome.storage.sync.get(SESSION_ORDER_KEY);
-        order.push(newSession.id); // Add new session ID to the end of the order
+        order.unshift(newSession.id); // Add new session ID to the beginning of the order
 
         const sessionKey = `${SESSION_PREFIX}${newSession.id}`;
         // Save the new session object and the updated order array
@@ -217,7 +218,13 @@ const handleSavedListClick = async (e) => {
         return;
     }
 
-    // Expand/Collapse (Chevron or Header BG)
+    // Open in Current Window (Click on Name/Title)
+    if (e.target.closest('.session-title-container') && !e.target.closest('.rename-input') && !e.target.closest('.edit-name')) {
+        openSessionInCurrentWindow(id);
+        return;
+    }
+
+    // Expand/Collapse (Chevron or residual Header BG)
     const expandToggle = e.target.closest('.expand-toggle') || (e.target.closest('.session-header') && !e.target.closest('.session-btn') && !e.target.closest('.rename-input'));
     if (expandToggle) {
         expandedSessionId = expandedSessionId === id ? null : id;
@@ -291,8 +298,12 @@ const openSessionInCurrentWindow = async (id) => {
 const openSessionInNewWindow = async (id) => {
     const session = await getSessionData(id);
     if (session && session.urls) {
+        // Get current window state to determine if we should open in incognito
+        const currentWindow = await chrome.windows.getCurrent();
+        const isIncognito = currentWindow.incognito;
+
         const urls = session.urls.map(t => t.url);
-        chrome.windows.create({ url: urls, focused: true });
+        chrome.windows.create({ url: urls, focused: true, incognito: isIncognito });
         showMessage(`Opened '${session.name}' in new window.`);
     }
 };

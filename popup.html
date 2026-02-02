@@ -10,38 +10,52 @@
     <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-    <div class="container">
-        <div class="actions-grid">
-            <button id="copyAllTabsBtn" class="action-btn" title="Copy All URLs">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-            </button>
-            <button id="pasteAndOpenBtn" class="action-btn" title="Paste and Open URLs">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19 2h-4.18C14.4.84 13.3 0 12 0S9.6.84 9.18 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm5 11.5-5 5-5-5 1.41-1.41L11 13.67V6h2v7.67l2.59-2.58L17 13.5z"/></svg>
-            </button>
-            <button id="saveCurrentCopyBtn" class="action-btn" title="Save Current Session" disabled>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
-            </button>
-            
-            <button id="exportBtn" class="action-btn" title="Export Sessions">
-                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-            </button>
-            <label for="importInput" id="importBtn" class="action-btn" title="Import Sessions">
-                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0z" fill="none"/><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
-            </label>
-            <input type="file" id="importInput" accept=".json" style="display: none;" />
+    <div class="app-container">
+        <header class="app-header">
+            <h1 class="app-title">Tab Manager</h1>
+            <div class="header-tools">
+                <button id="exportBtn" class="tool-btn" title="Export Sessions">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 16L7 11L8.41 9.59L11 12.17V4H13V12.17L15.59 9.59L17 11L12 16ZM6 20C5.45 20 4.9792 19.8042 4.5875 19.4125C4.1958 19.0208 4 18.55 4 18V15H6V18H18V15H20V18C20 18.55 19.8042 19.0208 19.4125 19.4125C19.0208 19.8042 18.55 20 18 20H6Z"/></svg>
+                </button>
+                <label for="importInput" id="importBtn" class="tool-btn" title="Import Sessions">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11 16V7.83L8.41 10.41L7 9L12 4L17 9L15.59 10.41L13 7.83V16H11ZM6 20C5.45 20 4.9792 19.8042 4.5875 19.4125C4.1958 19.0208 4 18.55 4 18V15H6V18H18V15H20V18C20 18.55 19.8042 19.0208 19.4125 19.4125C19.0208 19.8042 18.55 20 18 20H6Z"/></svg>
+                </label>
+                <input type="file" id="importInput" accept=".json" style="display: none;" />
+            </div>
+        </header>
+
+        <div class="primary-actions">
+            <div class="action-card" id="copyAllTabsBtn">
+                <div class="icon-box blue">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z"/></svg>
+                </div>
+                <span>Copy All</span>
+            </div>
+            <div class="action-card" id="saveCurrentCopyBtn">
+                <div class="icon-box green">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H5C3.89 3 3 3.9 3 5V19C3 20.1 3.89 21 5 21H19C20.1 21 21 20.1 21 19V7L17 3ZM12 19C10.34 19 9 17.66 9 16C9 14.34 10.34 13 12 13C13.66 13 15 14.34 15 16C15 17.66 13.66 19 12 19ZM15 9H5V5H15V9Z"/></svg>
+                </div>
+                <span>Save</span>
+            </div>
+            <div class="action-card" id="pasteAndOpenBtn">
+                <div class="icon-box purple">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19 2H14.82C14.4 0.84 13.3 0 12 0C10.7 0 9.6 0.84 9.18 2H5C3.9 2 3 2.9 3 4V20C3 21.1 3.9 22 5 22H19C20.1 22 21 21.1 21 20V4C21 2.9 20.1 2 19 2ZM12 2C12.55 2 13 2.45 13 3C13 3.55 12.55 4 12 4C11.45 4 11 3.55 11 3C11 2.45 11.45 2 12 2ZM19 20H5V4H19V20Z"/></svg>
+                </div>
+                <span>Paste</span>
+            </div>
         </div>
 
         <div id="saveForm" class="save-form hidden">
-            <input type="text" id="saveNameInput" placeholder="Enter session name">
-            <button id="confirmSaveNameBtn" title="Confirm Save">
+            <input type="text" id="saveNameInput" placeholder="Name this session...">
+            <button id="confirmSaveNameBtn" class="confirm-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
             </button>
         </div>
 
+        <div class="sessions-section-title">Saved Sessions</div>
         <div class="list-container">
-            <p id="noSavedTabsMessage" class="hidden">No saved sessions.</p>
-            <div id="savedTabsList">
-                </div>
+            <p id="noSavedTabsMessage" class="hidden">No saved sessions yet.</p>
+            <div id="savedTabsList"></div>
         </div>
 
         <div id="messageBox" class="message-box" aria-live="polite"></div>

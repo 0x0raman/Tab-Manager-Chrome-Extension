@@ -237,18 +237,57 @@ body {
 
 
 /* --- Sessions List --- */
-.sessions-section-title {
+.sessions-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 0 20px 10px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-color);
+    margin-bottom: 0;
+}
+
+.sessions-section-title {
     font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--text-secondary);
-    border-bottom: 1px solid var(--border-color);
-    /* Divider */
-    margin-bottom: 0;
+}
+
+.search-container {
+    position: relative;
+    width: 140px;
+    display: flex;
+    align-items: center;
+}
+
+#searchSessionsInput {
+    width: 100%;
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 4px 24px 4px 8px;
+    /* Room for icon */
+    font-size: 11px;
+    color: var(--text-primary);
+    font-family: inherit;
+    outline: none;
+    transition: var(--transition);
+}
+
+#searchSessionsInput:focus {
+    border-color: var(--primary-blue);
     background: var(--bg-color);
-    /* Sticky header feel if needed */
+}
+
+.search-container svg {
+    position: absolute;
+    right: 6px;
+    width: 12px;
+    height: 12px;
+    color: var(--text-secondary);
+    pointer-events: none;
 }
 
 .list-container {
@@ -531,8 +570,13 @@ body {
     background: var(--surface-hover);
 }
 
-.sortable-drag {
-    cursor: grabbing;
-    opacity: 0.9;
-    transform: scale(1.02);
+
+/* Search Highlight */
+.text-highlight {
+    background-color: rgba(251, 191, 36, 0.2);
+    /* Amber with opacity */
+    color: #fbbf24;
+    /* Amber text */
+    border-radius: 2px;
+    font-weight: 600;
 }

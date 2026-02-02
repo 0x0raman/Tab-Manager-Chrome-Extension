@@ -11,6 +11,7 @@ const savedTabsList = getEl('savedTabsList');
 const noSavedTabsMessage = getEl('noSavedTabsMessage');
 const exportBtn = getEl('exportBtn');
 const importInput = getEl('importInput');
+const searchInput = getEl('searchSessionsInput');
 
 // --- State & Constants ---
 let tabsToSave = [];
@@ -19,6 +20,27 @@ let expandedSessionId = null;
 let editingSessionId = null;
 const SESSION_PREFIX = 'session_';
 const SESSION_ORDER_KEY = 'session_order';
+
+// --- Helper Functions ---
+const highlightText = (text, query) => {
+    if (!query || !text) return text;
+
+    const lowerText = text.toLowerCase();
+    const lowerQuery = query.toLowerCase();
+    const index = lowerText.indexOf(lowerQuery);
+
+    let displayText = text;
+
+    // Smart Slicing: If match is deep (> 30 chars), cut the start
+    if (index > 30) {
+        // Keep 12 chars of context before the match
+        const start = Math.max(0, index - 12);
+        displayText = '...' + text.substring(start);
+    }
+
+    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    return displayText.replace(regex, '<span class="text-highlight">$1</span>');
+};
 
 // --- UI Functions ---
 const showMessage = (message, type = 'success', duration = 3000) => {
@@ -36,14 +58,33 @@ const toggleSaveForm = (show) => {
 };
 
 const renderSavedSessions = async () => {
+    // Always fetch fresh data to sync with storage
     const sessions = await getSyncedSessions();
+    const query = searchInput.value.toLowerCase().trim();
+
+    let displaySessions = sessions;
+
+    // Filter if search is active
+    if (query) {
+        displaySessions = sessions.filter(session => {
+            const nameMatch = session.name.toLowerCase().includes(query);
+            const urlMatch = session.urls && session.urls.some(u =>
+                (u.title && u.title.toLowerCase().includes(query)) ||
+                (u.url && u.url.toLowerCase().includes(query))
+            );
+            return nameMatch || urlMatch;
+        });
+    }
+
     savedTabsList.innerHTML = '';
 
-    noSavedTabsMessage.classList.toggle('hidden', sessions.length > 0);
-    if (sessions.length === 0) return;
+    noSavedTabsMessage.textContent = query ? 'No results found.' : 'No saved sessions yet.';
+    noSavedTabsMessage.classList.toggle('hidden', displaySessions.length > 0);
+
+    if (displaySessions.length === 0) return;
 
     const fragment = document.createDocumentFragment();
-    sessions.forEach(session => {
+    displaySessions.forEach(session => {
         const itemDiv = document.createElement('div');
         itemDiv.className = 'saved-item';
         itemDiv.dataset.id = session.id;
@@ -52,7 +93,11 @@ const renderSavedSessions = async () => {
         const isEditing = editingSessionId === session.id;
 
         // --- Header Section ---
-        let nameHtml = `<span class="saved-item-name" title="${session.name}">${session.name}</span>`;
+        let displayName = session.name;
+        // Highlight name if matching query
+        if (query && !isEditing) displayName = highlightText(displayName, query);
+
+        let nameHtml = `<span class="saved-item-name" title="${session.name}">${displayName}</span>`;
         if (isEditing) {
             nameHtml = `<input type="text" class="rename-input" value="${session.name}">`;
         }
@@ -84,14 +129,32 @@ const renderSavedSessions = async () => {
             
             <!-- Expanded List -->
             <div class="url-list ${isExpanded ? 'visible' : ''}">
-                ${isExpanded && session.urls ? session.urls.map((url, idx) => `
+                ${isExpanded && session.urls ? session.urls.map((url, idx) => {
+            let displayString = url.title || url.url;
+
+            if (query) {
+                const titleLower = (url.title || '').toLowerCase();
+                const urlLower = (url.url || '').toLowerCase();
+
+                // If title matches (or no title exists so we are using url as title), highlight it
+                if (titleLower.includes(query)) {
+                    displayString = highlightText(displayString, query);
+                }
+                // If title doesn't match but URL does, switch to showing the URL
+                else if (urlLower.includes(query)) {
+                    displayString = highlightText(url.url, query);
+                }
+            }
+
+            return `
                     <div class="url-item" data-idx="${idx}">
-                        <span class="url-text" title="${url.url}">${url.title || url.url}</span>
+                        <span class="url-text" title="${url.url}">${displayString}</span>
                         <button class="url-delete-btn" title="Remove URL">
                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                         </button>
                     </div>
-                `).join('') : ''}
+                `;
+        }).join('') : ''}
             </div>
         `;
         fragment.appendChild(itemDiv);
@@ -103,12 +166,22 @@ const renderSavedSessions = async () => {
         const input = savedTabsList.querySelector(`.saved-item[data-id="${editingSessionId}"] .rename-input`);
         if (input) {
             input.focus();
-            input.select(); // Select all text for easy replacement
+            input.select();
             input.addEventListener('blur', () => handleRenameFinish(editingSessionId, input.value));
             input.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') handleRenameFinish(editingSessionId, input.value);
             });
         }
+    }
+
+    // Scroll to expanded item if searching
+    if (query && expandedSessionId) {
+        setTimeout(() => {
+            const expandedEl = savedTabsList.querySelector(`.saved-item[data-id="${expandedSessionId}"]`);
+            if (expandedEl) {
+                expandedEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }, 10);
     }
 };
 
@@ -381,6 +454,11 @@ const handleImport = (event) => {
     reader.readAsText(file);
 };
 
+const handleSearch = () => {
+    // Just trigger re-render; it will read the input value
+    renderSavedSessions();
+};
+
 // --- Initialization ---
 const init = () => {
     copyAllTabsBtn.addEventListener('click', handleCopy);
@@ -392,6 +470,7 @@ const init = () => {
     savedTabsList.addEventListener('click', handleSavedListClick);
     exportBtn.addEventListener('click', handleExport);
     importInput.addEventListener('change', handleImport);
+    searchInput.addEventListener('input', handleSearch);
 
     // Listen for any changes in sync storage to re-render the list
     chrome.storage.onChanged.addListener((changes, namespace) => {

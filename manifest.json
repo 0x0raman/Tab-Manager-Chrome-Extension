@@ -21,6 +21,7 @@
     "clipboardRead",
     "clipboardWrite",
     "notifications",
+    "tabGroups",
     "storage"
   ],
   "incognito": "spanning"

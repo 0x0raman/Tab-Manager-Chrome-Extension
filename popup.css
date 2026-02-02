@@ -186,12 +186,18 @@ body {
     cursor: grabbing !important;
 }
 
-.delete-button {
+.session-controls {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-left: auto;
+}
+
+.session-btn {
     background: none;
     border: none;
     color: var(--text-secondary);
     padding: 0;
-    margin-left: auto;
     flex-shrink: 0;
     width: 24px;
     height: 24px;
@@ -203,9 +209,13 @@ body {
     transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.delete-button:hover {
-    background-color: var(--danger-color);
+.session-btn:hover {
+    background-color: var(--border-color);
     color: var(--text-primary);
+}
+
+.session-btn.delete:hover {
+    background-color: var(--danger-color);
 }
 
 .delete-icon {

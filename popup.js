@@ -47,9 +47,17 @@ const renderSavedSessions = async () => {
         itemDiv.dataset.id = session.id;
         itemDiv.innerHTML = `
             <span class="saved-item-name">${session.name}</span>
-            <button class="delete-button" aria-label="Delete ${session.name}">
-                <div class="delete-icon"></div>
-            </button>
+            <div class="session-controls">
+                <button class="session-btn open-window" title="Open in New Window">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M19 19H5V5h7V3H5a2 2 0 00-2 2v14a2 2 0 002 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+                </button>
+                <button class="session-btn open-group" title="Open in Tab Group">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M4 14h4v-4H4v4zm0 5h4v-4H4v4zM4 9h4V5H4v4zm5 5h12v-4H9v4zm0 5h12v-4H9v4zM9 5v4h12V5H9z"/></svg>
+                </button>
+                <button class="session-btn delete" title="Delete Session">
+                    <div class="delete-icon"></div>
+                </button>
+            </div>
         `;
         fragment.appendChild(itemDiv);
     });
@@ -144,9 +152,17 @@ const handleSavedListClick = async (e) => {
     if (!item) return;
 
     const id = item.dataset.id;
-    const button = e.target.closest('.delete-button');
+    const btn = e.target.closest('.session-btn');
 
-    if (button) { // Handle Delete
+    // If clicking the item text (not a button), open in current window (default behavior)
+    if (!btn) { 
+        if (!e.target.closest('.session-controls')) {
+             openSessionInCurrentWindow(id);
+        }
+        return;
+    }
+
+    if (btn.classList.contains('delete')) {
         const sessionKey = `${SESSION_PREFIX}${id}`;
         const { [SESSION_ORDER_KEY]: order = [] } = await chrome.storage.sync.get(SESSION_ORDER_KEY);
         const newOrder = order.filter(sessionId => sessionId !== id);
@@ -156,15 +172,54 @@ const handleSavedListClick = async (e) => {
         await chrome.storage.sync.set({ [SESSION_ORDER_KEY]: newOrder });
         
         showMessage("Session deleted.", "success");
-    } else { // Handle Open
-        const sessionKey = `${SESSION_PREFIX}${id}`;
-        const data = await chrome.storage.sync.get(sessionKey);
-        const session = data[sessionKey];
-        if (session && session.urls) {
-            session.urls.forEach(tab => chrome.tabs.create({ url: tab.url, active: false }));
-            showMessage(`Opening session '${session.name}'...`);
+    } else if (btn.classList.contains('open-window')) {
+        openSessionInNewWindow(id);
+    } else if (btn.classList.contains('open-group')) {
+        openSessionInGroup(id);
+    }
+};
+
+const getSessionData = async (id) => {
+    const sessionKey = `${SESSION_PREFIX}${id}`;
+    const data = await chrome.storage.sync.get(sessionKey);
+    return data[sessionKey];
+};
+
+const openSessionInCurrentWindow = async (id) => {
+    const session = await getSessionData(id);
+    if (session && session.urls) {
+        session.urls.forEach(tab => chrome.tabs.create({ url: tab.url, active: false }));
+        showMessage(`Opening '${session.name}'...`);
+    }
+};
+
+const openSessionInNewWindow = async (id) => {
+     const session = await getSessionData(id);
+     if (session && session.urls) {
+         const urls = session.urls.map(t => t.url);
+         chrome.windows.create({ url: urls, focused: true });
+         showMessage(`Opened '${session.name}' in new window.`);
+     }
+};
+
+const openSessionInGroup = async (id) => {
+    const session = await getSessionData(id);
+    if (session && session.urls) {
+        const tabIds = [];
+        // Create tabs first
+        for (const tab of session.urls) {
+            const newTab = await chrome.tabs.create({ url: tab.url, active: false });
+            tabIds.push(newTab.id);
+        }
+        
+        // Group them
+        if (tabIds.length > 0) {
+            const groupId = await chrome.tabs.group({ tabIds });
+            await chrome.tabGroups.update(groupId, { title: session.name });
+            showMessage(`Opened '${session.name}' in group.`);
         }
     }
+
 };
 
 const handleExport = async () => {

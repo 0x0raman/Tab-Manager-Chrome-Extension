@@ -267,13 +267,54 @@ body {
     background: var(--surface-color);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
-    padding: 4px 24px 4px 8px;
+    padding: 4px 28px 4px 8px;
+    /* Room for clear btn */
     /* Room for icon */
     font-size: 11px;
     color: var(--text-primary);
     font-family: inherit;
     outline: none;
     transition: var(--transition);
+}
+
+.clear-search-btn {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+    height: 18px;
+    width: 18px;
+    z-index: 2;
+    line-height: 1;
+    /* Prevent font baseline shift */
+}
+
+.clear-search-btn svg {
+    width: 14px;
+    height: 14px;
+    display: block;
+    margin-left: 1px;
+}
+
+
+
+.clear-search-btn:hover {
+    background-color: var(--surface-hover);
+    color: var(--text-primary);
+}
+
+.clear-search-btn.hidden {
+    display: none;
 }
 
 #searchSessionsInput:focus {

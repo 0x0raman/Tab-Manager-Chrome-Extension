@@ -12,6 +12,8 @@ const noSavedTabsMessage = getEl('noSavedTabsMessage');
 const exportBtn = getEl('exportBtn');
 const importInput = getEl('importInput');
 const searchInput = getEl('searchSessionsInput');
+const clearSearchBtn = getEl('clearSearchBtn');
+const searchIcon = getEl('searchIcon');
 
 // --- State & Constants ---
 let tabsToSave = [];
@@ -454,8 +456,21 @@ const handleImport = (event) => {
     reader.readAsText(file);
 };
 
+
+
 const handleSearch = () => {
     // Just trigger re-render; it will read the input value
+    const query = searchInput.value;
+    if (clearSearchBtn) clearSearchBtn.classList.toggle('hidden', !query);
+    if (searchIcon) searchIcon.classList.toggle('hidden', !!query);
+    renderSavedSessions();
+};
+
+const clearSearch = () => {
+    searchInput.value = '';
+    if (clearSearchBtn) clearSearchBtn.classList.add('hidden');
+    if (searchIcon) searchIcon.classList.remove('hidden');
+    searchInput.focus();
     renderSavedSessions();
 };
 
@@ -471,6 +486,7 @@ const init = () => {
     exportBtn.addEventListener('click', handleExport);
     importInput.addEventListener('change', handleImport);
     searchInput.addEventListener('input', handleSearch);
+    if (clearSearchBtn) clearSearchBtn.addEventListener('click', clearSearch);
 
     // Listen for any changes in sync storage to re-render the list
     chrome.storage.onChanged.addListener((changes, namespace) => {
